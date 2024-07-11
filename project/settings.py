@@ -23,9 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(dk^pu^@1e0u+oxta1o45+i=#%)x&$6%!5!=^9whbqodr-bo(('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False # Live - using mysqlDB
+# DEBUG = True # local - using Sqlite3
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,10 +78,21 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wbapi$wbapi',
+        'USER': 'wbapi',
+        'PASSWORD': 'Tops@123',
+        'HOST': 'wbapi.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
+    }
+}
+
+if DEBUG:
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+
 
 
 # Password validation

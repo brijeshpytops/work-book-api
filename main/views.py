@@ -6,6 +6,7 @@ from rest_framework import status
 
 from .serializers import LatestUpdatesSerializer
 from .models import LastestUpdates
+
 @api_view(['GET', 'POST'])
 def latestUpdateListAPI(request):
     if request.method == 'POST':
@@ -20,6 +21,7 @@ def latestUpdateListAPI(request):
             return Response(data, status_code)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     if request.method == 'GET':
         querySet = LastestUpdates.objects.all()
         serializer = LatestUpdatesSerializer(querySet, many=True)
@@ -28,11 +30,41 @@ def latestUpdateListAPI(request):
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def latestUpdateDetailAPI(request, update_id):
+    try:
+        querySet = LastestUpdates.objects.get(id=update_id)
+    except LastestUpdates.DoesNotExist:
+        return Response(data={'message': 'Data not found'}, status=status.HTTP_404_NOT_FOUND)
+    
     if request.method == 'GET':
-        pass
+        serializer = LatestUpdatesSerializer(querySet)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     if request.method == 'PUT':
-        pass
+        serializer = LatestUpdatesSerializer(querySet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'data':serializer.data,
+                'message': 'Latest-Update updated successfully.'
+            }
+            status_code = status.HTTP_200_OK
+            return Response(data, status_code)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     if request.method == 'PATCH':
-        pass
+        serializer = LatestUpdatesSerializer(querySet, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                'data':serializer.data,
+                'message': 'Latest-Update updated successfully.'
+            }
+            status_code = status.HTTP_200_OK
+            return Response(data, status_code)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == 'DELETE':
-        pass
+        querySet.delete()
+        return Response(data={'message': "Data deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
